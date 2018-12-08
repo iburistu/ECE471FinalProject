@@ -16,7 +16,7 @@ int main() {
             // if still out of bounds, increment personcount
             if (!((timediff * 1.05 > baseline) && (timediff * 0.95 < baseline))) {
                 personcount++;
-                // 
+                // wait until reset 
                 while(!((timediff * 1.05 > baseline) && (timediff * 0.95 < baseline))) {timediff = getTime();}
             }
         }

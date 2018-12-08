@@ -1,8 +1,8 @@
 #ifndef ultrasonic_h
 #define ultrasonic_h
 
-#define GPIO_TRIGGER 18
-#define GPIO_ECHO 24
+#define GPIO_TRIGGER 17
+#define GPIO_ECHO 27
 
 #include <stdio.h>
 #include <stdlib.h>
