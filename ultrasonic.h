@@ -134,12 +134,13 @@ double initUltrasonic(int trigger, int echo) {
     close(fd);
 
     // continue infinitely until a distance has been read and verified
+    unsigned int diff;
     double timediff;
-    double timediff_temp = 0.0;
+    unsigned int dist_diff = 0;
     unsigned int dist;
 	int continous = 0;
     struct timespec start, end;
-//    volatile int busywait = 0;
+
     while(1) {
 
         // send out a single 'chirp' through the trigger pin
@@ -150,42 +151,40 @@ double initUltrasonic(int trigger, int echo) {
         // turn off the chirp
         GPIOWrite(GPIO_TRIGGER,0);
 
+        // busy wait
         while (!GPIORead(GPIO_ECHO)) {}
 
         // save the start time
         clock_gettime(CLOCK_MONOTONIC, &start);
 
+        // busy wait
 		while (GPIORead(GPIO_ECHO)) {}
 
+        // grab the stop time
         clock_gettime(CLOCK_MONOTONIC, &end);
 
         // sleep 0.01 ms, or 10 us
         usleep(10000);
 
-        // save the response time
-        //while (!GPIORead(GPIO_ECHO)) {
-		//	printf("1\n");
-		//}
-
         // save the difference in times
         timediff = end.tv_nsec - start.tv_nsec;
 
+        // convert to distance
 		dist = (unsigned int)(timediff * .00001715);
 
 		printf("%d\n", dist);
 
-        // if the time stays relatively constant (+/- 5%), return the time
-        if ((timediff_temp * 1.05 > timediff) && (timediff_temp * .95 < timediff)) {
+        // if the distance stays relatively constant (+/- 5%), return the time
+        if ((dist * 19) / 20 < dist_diff && (dist * 21) / 20 + 1 > dist_diff) {
             continous++;
         }
         else {
             continous = 0;
-            timediff_temp = timediff;
-        //    sleep(1);
+            dist_diff = dist;
         }
 
         if (continous == 5) {
- //           return timediff;
+            return dist_diff;
         }
     }
 }
@@ -221,32 +220,41 @@ void disposeUltrasonic(int trigger, int echo) {
     close(fd);
 }
 
-double getTime(void) {
+double getDist(void) {
+    int dist;
     double timediff;
     struct timespec start, end;
 
     // send out a single 'chirp' through the trigger pin
     GPIOWrite(GPIO_TRIGGER,1);
 
-    // sleep 0.01 ms, or 10 us
     usleep(10);
 
     // turn off the chirp
     GPIOWrite(GPIO_TRIGGER,0);
 
-    // save the start time 
+    // busy wait
+    while (!GPIORead(GPIO_ECHO)) {}
+
+    // save the start time
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    // save the response time
-//    while (!GPIORead(GPIO_ECHO)) {}
-        
-    while (GPIORead(GPIO_ECHO)) {
-        clock_gettime(CLOCK_MONOTONIC, &end);            
-    }
+    // busy wait
+    while (GPIORead(GPIO_ECHO)) {}
 
+    // grab the stop time
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    // sleep 0.01 ms, or 10 us
+    usleep(10000);
+
+    // save the difference in times
     timediff = end.tv_nsec - start.tv_nsec;
 
-    return timediff;
+    // convert to distance
+    dist = (unsigned int)(timediff * .00001715);
+
+    return dist;
 }
 
 #endif
