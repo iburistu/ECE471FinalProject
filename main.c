@@ -16,8 +16,6 @@ int main() {
 		printf("Baseline is set at %d\n", baseline);
 		printf(".9 Baseline is set at %d\n", baseline * 9 / 10);
 
-		sleep(1);
-
 		displayNumPeople(&personcount);
 
 		//				scanf("%d",&Shit2Print);
@@ -39,15 +37,11 @@ int main() {
 						personcount++;	
 						printf("%d\n",personcount);
 
-						sleep(1);
-
 						displayNumPeople(&personcount);
-
-						sleep(1);
 
 						continous = 0;
 						// wait until reset 
-						while(dist_diff < baseline * 9 / 10 && continous2 < 5) {
+						while(dist_diff < baseline * 9 / 10 && continous2 < 35) {
 								dist_diff = getDist();
 								if (dist_diff > baseline * 9 / 10) {
 										continous2++;
