@@ -1,8 +1,8 @@
 #ifndef ultrasonic_h
 #define ultrasonic_h
 
-#define GPIO_TRIGGER 17
-#define GPIO_ECHO 27
+#define GPIO_TRIGGER 21
+#define GPIO_ECHO 20
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,32 +136,43 @@ double initUltrasonic(int trigger, int echo) {
     // continue infinitely until a distance has been read and verified
     double timediff;
     double timediff_temp = 0.0;
-    int continous = 0;
+    unsigned int dist;
+	int continous = 0;
     struct timespec start, end;
 //    volatile int busywait = 0;
     while(1) {
+
         // send out a single 'chirp' through the trigger pin
         GPIOWrite(GPIO_TRIGGER,1);
 
-        // sleep 0.01 ms, or 10 us
-        usleep(10);
+		usleep(10);
 
         // turn off the chirp
         GPIOWrite(GPIO_TRIGGER,0);
 
-        // save the start time 
+        while (!GPIORead(GPIO_ECHO)) {}
+
+        // save the start time
         clock_gettime(CLOCK_MONOTONIC, &start);
 
+		while (GPIORead(GPIO_ECHO)) {}
+
+        clock_gettime(CLOCK_MONOTONIC, &end);
+
+        // sleep 0.01 ms, or 10 us
+        usleep(10000);
+
         // save the response time
-        while (!GPIORead(GPIO_ECHO)) {}
-        
-        while (GPIORead(GPIO_ECHO)) {
-            clock_gettime(CLOCK_MONOTONIC, &end);            
-        }
+        //while (!GPIORead(GPIO_ECHO)) {
+		//	printf("1\n");
+		//}
 
         // save the difference in times
         timediff = end.tv_nsec - start.tv_nsec;
-        printf("%lf\n", timediff);
+
+		dist = (unsigned int)(timediff * .00001715);
+
+		printf("%d\n", dist);
 
         // if the time stays relatively constant (+/- 5%), return the time
         if ((timediff_temp * 1.05 > timediff) && (timediff_temp * .95 < timediff)) {
@@ -170,11 +181,11 @@ double initUltrasonic(int trigger, int echo) {
         else {
             continous = 0;
             timediff_temp = timediff;
-            sleep(1);
+        //    sleep(1);
         }
 
         if (continous == 5) {
-            return timediff;
+ //           return timediff;
         }
     }
 }
@@ -227,7 +238,7 @@ double getTime(void) {
     clock_gettime(CLOCK_MONOTONIC, &start);
 
     // save the response time
-    while (!GPIORead(GPIO_ECHO)) {}
+//    while (!GPIORead(GPIO_ECHO)) {}
         
     while (GPIORead(GPIO_ECHO)) {
         clock_gettime(CLOCK_MONOTONIC, &end);            
