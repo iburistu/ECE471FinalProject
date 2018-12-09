@@ -6,19 +6,19 @@
 #include <linux/i2c-dev.h>
 
 int LCDinit(void);
-int displayNumPeople(int people);
+int displayNumPeople(int* ppl);
 static double read_temp(char *filename);
 /*
 int main(){
 
-	int ppl;
+	int* ppl;
 
 	if(LCDinit() == -1){
 		printf("error in LCDinit\n");	//error checking
 	}
 
 	while(1){
-		scanf("%d",&ppl);
+		scanf("%d",ppl);
 		displayNumPeople(ppl);
 	}
 	
@@ -81,7 +81,9 @@ int LCDinit(void) {
 		close(fd);
 }
 
-int displayNumPeople(int people){
+int displayNumPeople(int* ppl){
+
+		int people = *ppl;
 
 	    unsigned char buffer[17];
 
@@ -125,5 +127,5 @@ int displayNumPeople(int people){
 		close(fd);
 
 
-		return;
+		return 0;
 }
