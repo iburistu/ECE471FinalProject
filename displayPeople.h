@@ -129,3 +129,65 @@ int displayNumPeople(int* ppl){
 
 		return 0;
 }
+
+int displayFromFile(char* filename) {
+	unsigned char buffer[17];
+	int display[12] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x63, 0x40};
+	int fd, fd2;
+	int people = 0;
+	char string_buffer[34];
+    char buffer2[3];
+
+	fd = open ("/dev/i2c-1", O_RDWR);           //open the file
+	if (fd < 0){                                    //error checking
+			printf("error on open\n");
+			return -1;
+	}
+
+	/* Set slave address */
+
+	int result = ioctl(fd, I2C_SLAVE, 0x70);
+	if (result < 0){                            //error checking
+		printf("error on ioctl\n");
+			return -1;
+	}
+
+    // generate path string for open()
+    sprintf(string_buffer, "./", filename);
+
+	fd2 = open(string_buffer, O_RDONLY);
+	if (fd < 0) {
+		printf("error on opening people file\n");
+		return -1;
+	}
+
+	    // read the file on error print to standard error
+    if (read(fd, buffer2, 3) == -1) {
+		fprintf(stderr, "error reading from people file\n");
+		return -1;
+    }
+
+	close(fd2);
+	
+	people = atoi(buffer2);
+
+	buffer[9] = display[people % 10];				
+
+	people /= 10;
+	if(people != 0){
+			buffer[7] = display[people % 10];		//writes the decimal
+	}
+
+	people /= 10;
+	if(people != 0){
+			buffer[3] = display[people % 10];	//0x80 adds the dicimal point
+	}
+
+	people /= 10;
+	if(people != 0){
+			buffer[1] = display[people % 10];
+	}
+
+	write(fd,buffer,17);    //rewrite
+	close(fd);
+}
