@@ -7,24 +7,7 @@
 
 int LCDinit(void);
 int displayNumPeople(int* ppl);
-static double read_temp(char *filename);
-/*
-int main(){
 
-	int* ppl;
-
-	if(LCDinit() == -1){
-		printf("error in LCDinit\n");	//error checking
-	}
-
-	while(1){
-		scanf("%d",ppl);
-		displayNumPeople(ppl);
-	}
-	
-
-}
-*/
 int LCDinit(void) {
 
 		int fd;

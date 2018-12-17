@@ -1,3 +1,8 @@
+/*
+Ultrasonic Person Sensor
+Ryan Pedersen and Zachary Linkletter
+*/
+
 #include "ultrasonic.h"
 #include "displayPeople.h"
 
@@ -6,7 +11,6 @@ int main() {
 		int baseline = initUltrasonic(GPIO_TRIGGER, GPIO_ECHO);
 		int personcount = 0;
 		int continous = 0, continous2 = 0;
-		double Shit2Print;
 
 		if(LCDinit() == -1){
 				printf("Error in LCDinit\n");
@@ -17,11 +21,6 @@ int main() {
 		printf(".9 Baseline is set at %d\n", baseline * 9 / 10);
 
 		displayNumPeople(&personcount);
-
-		//				scanf("%d",&Shit2Print);
-		//				printf("sdkhfk\t%d\n",Shit2Print);
-		//				Shit2Print = (double)getDist();
-		//				displayNumPeople( (int)Shit2Print);
 
 		// infinte polling loop
 		while(1) {
